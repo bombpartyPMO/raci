@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RACI Matrix — BombParty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS — BombParty Hub Style
+═══════════════════════════════════════════ */
+:root {
+  --navy:    #1A2238;
+  --navy2:   #243050;
+  --citron:  #D4E44B;
+  --soft:    #F7F9FC;
+  --white:   #FFFFFF;
+  --line:    #E2E8F0;
+  --text:    #1A2238;
+  --text2:   #4A5568;
+  --text3:   #718096;
+  --r-bg:    #FEE2E2; --r-fg: #C53030; --r-border: #FC8181;
+  --a-bg:    #FEF3C7; --a-fg: #92400E; --a-border: #FBBF24;
+  --c-bg:    #DBEAFE; --c-fg: #1E40AF; --c-border: #93C5FD;
+  --i-bg:    #D1FAE5; --i-fg: #065F46; --i-border: #6EE7B7;
+  --shadow:  0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+  --radius:  12px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--soft);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── LOGIN ─── */
+#loginWrap {
+  position: fixed; inset: 0; background: var(--soft);
+  display: flex; align-items: center; justify-content: center; z-index: 999;
+}
+.login-card {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: 18px; padding: 44px 40px; width: 380px;
+  box-shadow: 0 8px 40px rgba(26,34,56,0.10);
+}
+.login-logo {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 28px;
+}
+.login-badge {
+  background: var(--navy); color: var(--citron);
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; padding: 4px 10px; border-radius: 6px;
+}
+.login-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.login-sub   { font-size: 13px; color: var(--text3); margin-bottom: 28px; }
+.lf label    { display: block; font-size: 11px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--text2); margin-bottom: 6px; }
+.lf input    { width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--soft); outline: none; transition: border .15s; margin-bottom: 16px; }
+.lf input:focus { border-color: var(--navy); background: var(--white); }
+.login-btn {
+  width: 100%; padding: 11px; background: var(--navy); color: var(--citron);
+  border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity .15s;
+}
+.login-btn:hover { opacity: .88; }
+.login-err { font-size: 12px; color: #C53030; margin-top: 10px; display: none; }
+.login-note { font-size: 11px; color: var(--text3); margin-top: 14px; text-align: center; }
+
+/* ─── APP SHELL ─── */
+#appShell { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ─── TOPBAR ─── */
+.topbar {
+  background: var(--navy); padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px; position: sticky; top: 0; z-index: 100;
+  border-bottom: 3px solid var(--citron);
+}
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.tb-badge {
+  background: var(--citron); color: var(--navy);
+  font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+  text-transform: uppercase; padding: 4px 10px; border-radius: 6px;
+}
+.tb-title { color: rgba(255,255,255,.9); font-size: 14px; font-weight: 500; }
+.tb-sep   { color: rgba(255,255,255,.3); font-size: 14px; }
+.tb-page  { color: var(--citron); font-size: 14px; font-weight: 600; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.tb-date  { color: rgba(255,255,255,.5); font-size: 12px; }
+.tb-user-pill {
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+  border-radius: 100px; padding: 5px 12px 5px 6px;
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+}
+.tb-av {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--citron); color: var(--navy);
+  font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+}
+.tb-uname { color: rgba(255,255,255,.85); font-size: 12px; font-weight: 500; }
+.tb-logout-btn {
+  background: transparent; border: 1px solid rgba(255,255,255,.2);
+  color: rgba(255,255,255,.6); padding: 5px 12px; border-radius: 6px;
+  font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+}
+.tb-logout-btn:hover { background: rgba(255,255,255,.08); color: white; }
+
+/* ─── TABS ─── */
+.tabs-bar {
+  background: var(--white); border-bottom: 1px solid var(--line);
+  padding: 0 28px; display: flex; gap: 0; overflow-x: auto;
+}
+.tab-btn {
+  padding: 14px 20px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500; color: var(--text3);
+  border: none; background: none; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  white-space: nowrap; transition: color .15s, border-color .15s;
+  display: flex; align-items: center; gap: 7px;
+}
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active { color: var(--navy); border-bottom-color: var(--navy); font-weight: 600; }
+.tab-num { font-size: 10px; font-weight: 700; color: var(--citron); background: var(--navy); padding: 1px 5px; border-radius: 4px; }
+
+/* ─── MAIN CONTENT ─── */
+.main { flex: 1; padding: 28px; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+/* ─── PAGE ─── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ─── PAGE HEADER ─── */
+.page-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+}
+.page-title { font-size: 22px; font-weight: 700; color: var(--text); }
+.page-sub   { font-size: 13px; color: var(--text3); margin-top: 2px; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ─── BUTTONS ─── */
+.btn {
+  padding: 8px 16px; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+  display: inline-flex; align-items: center; gap: 6px; transition: all .15s;
+}
+.btn-primary { background: var(--navy); color: var(--citron); }
+.btn-primary:hover { opacity: .88; }
+.btn-outline { background: white; color: var(--text); border: 1px solid var(--line); }
+.btn-outline:hover { background: var(--soft); border-color: #CBD5E0; }
+.btn-sm { padding: 5px 11px; font-size: 12px; }
+
+/* ─── SECTION BLOCK ─── */
+.section-block {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden;
+}
+.section-block-header {
+  padding: 18px 22px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.sbh-left { display: flex; align-items: center; gap: 10px; }
+.sbh-icon { font-size: 18px; }
+.sbh-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.sbh-sub   { font-size: 12px; color: var(--text3); margin-top: 1px; }
+.section-block-body { padding: 22px; }
+
+/* ─── KPI CARDS ─── */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.kpi-card {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow);
+}
+.kpi-label { font-size: 11px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+.kpi-val   { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
+.kpi-note  { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+/* ─── RACI TABLE ─── */
+.raci-wrap { overflow-x: auto; }
+.raci-table {
+  width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px;
+}
+.raci-table th {
+  background: var(--navy); color: rgba(255,255,255,.9);
+  padding: 10px 14px; text-align: left; font-size: 11px;
+  font-weight: 600; letter-spacing: .6px; text-transform: uppercase;
+  white-space: nowrap;
+}
+.raci-table th:first-child { border-radius: 0; min-width: 240px; }
+.raci-table th.role-col { text-align: center; min-width: 100px; }
+.raci-table td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.raci-table tr:last-child td { border-bottom: none; }
+.raci-table tr:hover td { background: var(--soft); }
+.task-name    { font-weight: 600; color: var(--text); font-size: 13px; }
+.task-cat     { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.task-cell    { text-align: center; }
+
+/* ─── RACI BADGES ─── */
+.raci-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px; font-size: 13px;
+  font-weight: 800; cursor: pointer; transition: all .12s; border: 2px solid transparent;
+  font-family: 'DM Mono', monospace;
+}
+.raci-badge.R { background: var(--r-bg); color: var(--r-fg); border-color: var(--r-border); }
+.raci-badge.A { background: var(--a-bg); color: var(--a-fg); border-color: var(--a-border); }
+.raci-badge.C { background: var(--c-bg); color: var(--c-fg); border-color: var(--c-border); }
+.raci-badge.I { background: var(--i-bg); color: var(--i-fg); border-color: var(--i-border); }
+.raci-badge.X { background: transparent; color: var(--line); border-color: transparent; font-size: 16px; }
+.raci-badge:hover { transform: scale(1.12); box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+
+/* ─── CATEGORY ROW ─── */
+.cat-row td {
+  background: var(--soft); padding: 8px 14px;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--line);
+}
+
+/* ─── LEGEND ─── */
+.legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 14px 22px; border-top: 1px solid var(--line); background: var(--soft); }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text2); }
+.legend-dot  { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 2px solid transparent; font-family: 'DM Mono', monospace; }
+
+/* ─── FILTER TOOLBAR ─── */
+.filter-bar {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; align-items: center;
+}
+.filter-select {
+  padding: 7px 12px; border: 1px solid var(--line); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+  background: var(--white); outline: none; cursor: pointer;
+}
+.filter-select:focus { border-color: var(--navy); }
+.search-input {
+  padding: 7px 12px; border: 1px solid var(--line); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+  background: var(--white); outline: none; min-width: 200px;
+}
+.search-input:focus { border-color: var(--navy); }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(26,34,56,0.45);
+  display: none; align-items: center; justify-content: center; z-index: 500;
+}
+.modal-overlay.open { display: flex; }
+.modal-card {
+  background: white; border-radius: 16px; padding: 32px; width: 460px;
+  max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+}
+.modal-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.modal-sub    { font-size: 13px; color: var(--text3); margin-bottom: 22px; }
+.modal-field  { margin-bottom: 16px; }
+.modal-field label { display: block; font-size: 11px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--text2); margin-bottom: 6px; }
+.modal-field input, .modal-field select, .modal-field textarea {
+  width: 100%; padding: 9px 12px; border: 1px solid var(--line);
+  border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  color: var(--text); background: var(--soft); outline: none;
+}
+.modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color: var(--navy); background: white; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+
+/* ─── ROLE CARDS ─── */
+.role-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.role-card {
+  background: var(--soft); border: 1px solid var(--line);
+  border-radius: 10px; padding: 16px;
+}
+.role-card-name  { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.role-card-title { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
+.role-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+.role-stat  { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+
+/* ─── OVERVIEW TABLE ─── */
+.ov-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ov-table th { font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--text3); padding: 8px 14px; border-bottom: 2px solid var(--line); text-align: left; }
+.ov-table td { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.ov-table tr:last-child td { border-bottom: none; }
+.ov-table tr:hover td { background: var(--soft); }
+
+/* ─── STATUS BADGE ─── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px; border-radius: 100px; font-size: 11px; font-weight: 600;
+}
+.badge-blue   { background: #EBF8FF; color: #2B6CB0; }
+.badge-green  { background: #F0FFF4; color: #276749; }
+.badge-yellow { background: #FFFFF0; color: #7B6516; }
+.badge-gray   { background: #F7FAFC; color: var(--text3); border: 1px solid var(--line); }
+.badge-red    { background: #FFF5F5; color: #C53030; }
+
+/* ─── EMPTY STATE ─── */
+.empty-state { text-align: center; padding: 48px 24px; color: var(--text3); }
+.empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p  { font-size: 14px; }
+
+/* ─── CHARTS ─── */
+.role-bar-row { margin-bottom: 18px; }
+.role-bar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+.role-bar-name  { font-size:13px; font-weight:600; color:var(--text); }
+.role-bar-total { font-size:12px; color:var(--text3); }
+.role-bar-track { display:flex; height:28px; border-radius:8px; overflow:hidden; background:var(--line); gap:1px; }
+.role-bar-seg   { display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; font-family:'DM Mono',monospace; transition:width .4s ease; min-width:0; overflow:hidden; }
+.role-bar-seg.R { background:var(--r-bg); color:var(--r-fg); }
+.role-bar-seg.A { background:var(--a-bg); color:var(--a-fg); }
+.role-bar-seg.C { background:var(--c-bg); color:var(--c-fg); }
+.role-bar-seg.I { background:var(--i-bg); color:var(--i-fg); }
+.role-bar-seg.empty { background:var(--soft); color:var(--text3); font-weight:400; font-family:'DM Sans',sans-serif; font-size:12px; }
+.accountable-item { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); }
+.accountable-item:last-child { border-bottom:none; }
+.accountable-task { font-size:13px; color:var(--text); flex:1; }
+.accountable-role { font-size:11px; font-weight:700; padding:3px 9px; border-radius:100px; background:var(--a-bg); color:var(--a-fg); }
+
+@media (max-width: 700px) {
+  #chartBottomRow { grid-template-columns: 1fr; }
+}
+
+.raci-wrap::-webkit-scrollbar { height: 5px; }
+.raci-wrap::-webkit-scrollbar-track { background: var(--soft); }
+.raci-wrap::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+
+/* ─── JIRA ─── */
+.jira-connect-bar {
+  display:flex; align-items:center; gap:12px; padding:12px 18px;
+  background:var(--soft); border-bottom:1px solid var(--line); flex-wrap:wrap;
+}
+.jira-status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.jira-status-dot.connected { background:#38A169; box-shadow:0 0 0 3px rgba(56,161,105,.2); }
+.jira-status-dot.disconnected { background:#CBD5E0; }
+.jira-status-dot.loading { background:#FBBF24; animation:blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.jira-layout { display:grid; grid-template-columns:260px 1fr; gap:20px; align-items:start; }
+@media(max-width:800px){ .jira-layout { grid-template-columns:1fr; } }
+.jira-board-list { display:flex; flex-direction:column; gap:8px; }
+.jira-board-card {
+  background:var(--white); border:2px solid var(--line); border-radius:12px;
+  padding:14px 16px; cursor:pointer; transition:all .15s;
+}
+.jira-board-card:hover { border-color:#CBD5E0; box-shadow:var(--shadow); }
+.jira-board-card.active { border-color:var(--navy); background:var(--navy); }
+.jira-board-card.active .jb-key  { color:var(--citron); }
+.jira-board-card.active .jb-name { color:#fff; }
+.jira-board-card.active .jb-meta { color:rgba(255,255,255,.45); }
+.jira-board-card.active .jb-badge{ background:rgba(212,228,75,.15); color:var(--citron); }
+.jb-top  { display:flex; align-items:center; gap:10px; margin-bottom:2px; }
+.jb-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.jb-key  { font-size:10px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--text3); margin-bottom:1px; }
+.jb-name { font-size:13px; font-weight:700; color:var(--text); }
+.jb-meta { font-size:11px; color:var(--text3); }
+.jb-footer{ display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
+.jb-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:100px; background:var(--soft); color:var(--text3); }
+
+.jira-detail { display:flex; flex-direction:column; gap:14px; }
+.jira-board-header {
+  background:var(--navy); border-radius:var(--radius); padding:20px 24px;
+  display:flex; align-items:center; gap:14px;
+}
+.jira-board-header-icon { width:44px; height:44px; border-radius:10px; background:rgba(212,228,75,.15); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.jira-board-header h2 { font-size:18px; font-weight:800; color:#fff; margin-bottom:2px; }
+.jira-board-header p  { font-size:12px; color:rgba(255,255,255,.45); }
+
+.jira-kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+@media(max-width:600px){ .jira-kpi-row { grid-template-columns:repeat(2,1fr); } }
+.jira-kpi { border-radius:10px; padding:14px 16px; }
+.jira-kpi.R { background:var(--r-bg); border:1px solid var(--r-border); }
+.jira-kpi.A { background:var(--a-bg); border:1px solid var(--a-border); }
+.jira-kpi.C { background:var(--c-bg); border:1px solid var(--c-border); }
+.jira-kpi.I { background:var(--i-bg); border:1px solid var(--i-border); }
+.jira-kpi-label { font-size:10px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; margin-bottom:6px; }
+.jira-kpi.R .jira-kpi-label { color:var(--r-fg); }
+.jira-kpi.A .jira-kpi-label { color:var(--a-fg); }
+.jira-kpi.C .jira-kpi-label { color:var(--c-fg); }
+.jira-kpi.I .jira-kpi-label { color:var(--i-fg); }
+.jira-kpi-val { font-size:22px; font-weight:800; color:var(--text); }
+.jira-kpi-who { font-size:11px; color:var(--text3); margin-top:2px; }
+
+.jira-raci-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media(max-width:600px){ .jira-raci-grid { grid-template-columns:1fr; } }
+.jira-raci-group { border-radius:10px; padding:16px; }
+.jira-raci-group.R { background:var(--r-bg); border:1px solid var(--r-border); }
+.jira-raci-group.A { background:var(--a-bg); border:1px solid var(--a-border); }
+.jira-raci-group.C { background:var(--c-bg); border:1px solid var(--c-border); }
+.jira-raci-group.I { background:var(--i-bg); border:1px solid var(--i-border); }
+.jrg-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.jrg-letter { width:26px; height:26px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; font-family:'DM Mono',monospace; }
+.jira-raci-group.R .jrg-letter { background:var(--r-border); color:white; }
+.jira-raci-group.A .jrg-letter { background:var(--a-border); color:white; }
+.jira-raci-group.C .jrg-letter { background:var(--c-border); color:white; }
+.jira-raci-group.I .jrg-letter { background:var(--i-border); color:white; }
+.jrg-title { font-size:13px; font-weight:700; }
+.jira-raci-group.R .jrg-title { color:var(--r-fg); }
+.jira-raci-group.A .jrg-title { color:var(--a-fg); }
+.jira-raci-group.C .jrg-title { color:var(--c-fg); }
+.jira-raci-group.I .jrg-title { color:var(--i-fg); }
+.jrg-role-tag { display:inline-flex; align-items:center; gap:4px; margin:3px 3px 3px 0; padding:4px 10px; border-radius:100px; font-size:12px; font-weight:600; cursor:grab; user-select:none; transition:opacity .15s, transform .15s; }
+.jrg-role-tag:active { cursor:grabbing; opacity:.7; transform:scale(.95); }
+.jrg-role-tag.dragging { opacity:.35; }
+.jira-raci-group.R .jrg-role-tag { background:rgba(197,48,48,.1); color:var(--r-fg); }
+.jira-raci-group.A .jrg-role-tag { background:rgba(146,64,14,.1); color:var(--a-fg); }
+.jira-raci-group.C .jrg-role-tag { background:rgba(30,64,175,.1); color:var(--c-fg); }
+.jira-raci-group.I .jrg-role-tag { background:rgba(6,95,70,.1);   color:var(--i-fg); }
+.jrg-none { font-size:12px; color:var(--text3); font-style:italic; }
+
+.jira-raci-group { border-radius:10px; padding:16px; transition:box-shadow .15s, transform .1s; }
+.jira-raci-group.drag-over {
+  box-shadow: 0 0 0 3px currentColor;
+  transform: scale(1.01);
+}
+.jira-raci-group.R.drag-over { box-shadow: 0 0 0 3px var(--r-border); }
+.jira-raci-group.A.drag-over { box-shadow: 0 0 0 3px var(--a-border); }
+.jira-raci-group.C.drag-over { box-shadow: 0 0 0 3px var(--c-border); }
+.jira-raci-group.I.drag-over { box-shadow: 0 0 0 3px var(--i-border); }
+.jrg-drop-zone { min-height:32px; display:flex; flex-wrap:wrap; gap:3px; }
+.jrg-drop-hint { font-size:11px; color:var(--text3); font-style:italic; padding:4px 0; display:none; }
+.jira-raci-group.drag-over .jrg-drop-hint { display:block; }
+
+.drag-ghost {
+  position:fixed; pointer-events:none; z-index:9999;
+  padding:5px 12px; border-radius:100px; font-size:12px; font-weight:700;
+  background:var(--navy); color:var(--citron);
+  box-shadow:0 6px 20px rgba(0,0,0,.2); transform:rotate(-2deg);
+  font-family:'DM Sans',sans-serif; white-space:nowrap;
+}
+.jira-reassign-toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:var(--navy); color:var(--citron);
+  padding:10px 20px; border-radius:100px; font-size:13px; font-weight:600;
+  box-shadow:0 4px 20px rgba(0,0,0,.2); z-index:9999;
+  opacity:0; transition:opacity .2s; pointer-events:none;
+}
+.jira-reassign-toast.show { opacity:1; }
+
+.jira-task-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(0,0,0,.06); font-size:12px; gap:8px; }
+.jira-task-row:last-child { border-bottom:none; }
+.jira-task-name { color:var(--text); flex:1; }
+.jira-task-badges { display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; }
+.jira-task-badge { padding:2px 7px; border-radius:5px; font-size:10px; font-weight:800; font-family:'DM Mono',monospace; }
+.jira-task-badge.R { background:var(--r-bg); color:var(--r-fg); }
+.jira-task-badge.A { background:var(--a-bg); color:var(--a-fg); }
+.jira-task-badge.C { background:var(--c-bg); color:var(--c-fg); }
+.jira-task-badge.I { background:var(--i-bg); color:var(--i-fg); }
+
+.jira-empty { text-align:center; padding:48px 24px; color:var(--text3); }
+.jira-empty .icon { font-size:36px; margin-bottom:10px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════════ -->
+<div id="appShell">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="tb-badge">BombParty</span>
+      <span class="tb-title">PMO</span>
+      <span class="tb-sep">/</span>
+      <span class="tb-page" id="tbPage">RACI Matrix</span>
+    </div>
+    <div class="topbar-right">
+      <span class="tb-date" id="tbDate"></span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-bar">
+    <button class="tab-btn active" id="tab-matrix" onclick="showPage('matrix')">
+      <span class="tab-num">01</span> RACI Matrix
+    </button>
+    <button class="tab-btn" id="tab-roles" onclick="showPage('roles')">
+      <span class="tab-num">02</span> Roles & Owners
+    </button>
+    <button class="tab-btn" id="tab-workstreams" onclick="showPage('workstreams')">
+      <span class="tab-num">03</span> Workstreams
+    </button>
+    <button class="tab-btn" id="tab-overview" onclick="showPage('overview')">
+      <span class="tab-num">04</span> Summary View
+    </button>
+    <button class="tab-btn" id="tab-charts" onclick="showPage('charts')">
+      <span class="tab-num">05</span> Charts
+    </button>
+    <button class="tab-btn" id="tab-jira" onclick="showPage('jira')">
+      <span class="tab-num">06</span> Jira Boards
+    </button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ════════ PAGE: MATRIX ════════ -->
+    <div class="page active" id="page-matrix">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📋 RACI Matrix</div>
+          <div class="page-sub">Responsibility Assignment Matrix — BombParty Digital Products & Platforms</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddTask()">+ Add Task</button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-row" id="kpiRow"></div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <input class="search-input" id="searchInput" placeholder="🔍  Search tasks..." oninput="renderMatrix()"/>
+        <select class="filter-select" id="filterWS" onchange="renderMatrix()">
+          <option value="">All Workstreams</option>
+        </select>
+        <select class="filter-select" id="filterRole" onchange="renderMatrix()">
+          <option value="">All Roles</option>
+        </select>
+        <select class="filter-select" id="filterType" onchange="renderMatrix()">
+          <option value="">All RACI Types</option>
+          <option value="R">R — Responsible</option>
+          <option value="A">A — Accountable</option>
+          <option value="C">C — Consulted</option>
+          <option value="I">I — Informed</option>
+        </select>
+      </div>
+
+      <!-- RACI Table -->
+      <div class="section-block">
+        <div class="section-block-header">
+          <div class="sbh-left">
+            <span class="sbh-icon">📊</span>
+            <div>
+              <div class="sbh-title">Task &amp; Role Matrix</div>
+              <div class="sbh-sub">Click any cell to cycle R → A → C → I → (clear)</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" onclick="toggleEditMode()" id="editToggle">✏️ Edit Mode</button>
+          </div>
+        </div>
+        <div class="raci-wrap">
+          <table class="raci-table" id="raciTable"></table>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot R" style="background:var(--r-bg);color:var(--r-fg);border-color:var(--r-border)">R</div><span><b>Responsible</b> — Does the work</span></div>
+          <div class="legend-item"><div class="legend-dot A" style="background:var(--a-bg);color:var(--a-fg);border-color:var(--a-border)">A</div><span><b>Accountable</b> — Owns the outcome</span></div>
+          <div class="legend-item"><div class="legend-dot C" style="background:var(--c-bg);color:var(--c-fg);border-color:var(--c-border)">C</div><span><b>Consulted</b> — Provides input</span></div>
+          <div class="legend-item"><div class="legend-dot I" style="background:var(--i-bg);color:var(--i-fg);border-color:var(--i-border)">I</div><span><b>Informed</b> — Kept up to date</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: ROLES ════════ -->
+    <div class="page" id="page-roles">
+      <div class="page-header">
+        <div>
+          <div class="page-title">👥 Roles &amp; Owners</div>
+          <div class="page-sub">Manage team roles and their RACI participation summary</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openAddRole()">+ Add Role</button>
+      </div>
+      <div class="section-block">
+        <div class="section-block-header">
+          <div class="sbh-left"><span class="sbh-icon">🏷️</span><div><div class="sbh-title">Role Registry</div></div></div>
+        </div>
+        <div class="section-block-body">
+          <div class="role-grid" id="roleGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: WORKSTREAMS ════════ -->
+    <div class="page" id="page-workstreams">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🗂️ Workstreams</div>
+          <div class="page-sub">Projects and functional areas covered by this RACI</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openAddWS()">+ Add Workstream</button>
+      </div>
+      <div class="section-block">
+        <div class="section-block-header">
+          <div class="sbh-left"><span class="sbh-icon">📁</span><div><div class="sbh-title">Workstream Inventory</div></div></div>
+        </div>
+        <div class="section-block-body">
+          <table class="ov-table" id="wsTable">
+            <thead><tr><th>Workstream</th><th>Description</th><th>Status</th><th>Tasks</th><th>Owner</th></tr></thead>
+            <tbody id="wsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: OVERVIEW ════════ -->
+    <div class="page" id="page-overview">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📈 Summary View</div>
+          <div class="page-sub">Role-level RACI participation counts and coverage analysis</div>
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-block-header">
+          <div class="sbh-left"><span class="sbh-icon">📉</span><div><div class="sbh-title">RACI Coverage by Role</div></div></div>
+        </div>
+        <div class="section-block-body">
+          <table class="ov-table" id="summaryTable">
+            <thead><tr><th>Role</th><th>Name</th><th style="color:var(--r-fg)">R</th><th style="color:var(--a-fg)">A</th><th style="color:var(--c-fg)">C</th><th style="color:var(--i-fg)">I</th><th>Total</th><th>Load</th></tr></thead>
+            <tbody id="summaryBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-block-header">
+          <div class="sbh-left"><span class="sbh-icon">⚠️</span><div><div class="sbh-title">Gap Analysis</div></div></div>
+        </div>
+        <div class="section-block-body" id="gapBody"></div>
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: CHARTS ════════ -->
+    <div class="page" id="page-charts">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📊 RACI Charts</div>
+          <div class="page-sub">Visual breakdown of responsibilities by project or workstream</div>
+        </div>
+      </div>
+
+      <!-- Project Selector -->
+      <div class="section-block" style="margin-bottom:20px;">
+        <div class="section-block-body" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <div style="font-size:13px;font-weight:600;color:var(--text2);">Select Workstream:</div>
+          <select class="filter-select" id="chartWSSelect" onchange="renderCharts()" style="min-width:220px;font-weight:600;">
+          </select>
+          <div style="display:flex;gap:8px;margin-left:auto;">
+            <select class="filter-select" id="chartView" onchange="renderCharts()">
+              <option value="roles">By Role</option>
+              <option value="raci">By RACI Type</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart: RACI Role Bars -->
+      <div class="section-block" id="chartRoleBlock">
+        <div class="section-block-header">
+          <div class="sbh-left">
+            <span class="sbh-icon">👥</span>
+            <div>
+              <div class="sbh-title" id="chartRoleTitle">Role Responsibility Breakdown</div>
+              <div class="sbh-sub">How many tasks each role owns per RACI type in this workstream</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-block-body" id="chartRoleBody"></div>
+      </div>
+
+      <!-- Chart: RACI Type Donut-style -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" id="chartBottomRow">
+
+        <div class="section-block">
+          <div class="section-block-header">
+            <div class="sbh-left"><span class="sbh-icon">🥧</span><div><div class="sbh-title">RACI Distribution</div><div class="sbh-sub">Total assignments by type</div></div></div>
+          </div>
+          <div class="section-block-body" style="display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap;padding:28px 22px;">
+            <canvas id="donutCanvas" width="160" height="160"></canvas>
+            <div id="donutLegend" style="display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-block-header">
+            <div class="sbh-left"><span class="sbh-icon">🏆</span><div><div class="sbh-title">Task Owner Summary</div><div class="sbh-sub">Who is Accountable per task</div></div></div>
+          </div>
+          <div class="section-block-body" id="accountableList" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════ PAGE: JIRA ════════ -->
+    <div class="page" id="page-jira">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🔷 Jira Boards</div>
+          <div class="page-sub">Per-board RACI breakdown — each Jira project mapped to responsible parties</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-outline btn-sm" onclick="openJiraConfig()">⚙️ Configure</button>
+          <button class="btn btn-primary btn-sm" onclick="syncJira()" id="jiraSyncBtn">↻ Sync Boards</button>
+        </div>
+      </div>
+
+      <!-- Connect Bar -->
+      <div class="section-block" style="margin-bottom:18px;">
+        <div class="jira-connect-bar">
+          <div class="jira-status-dot disconnected" id="jiraDot"></div>
+          <div>
+            <div class="jira-status-text" id="jiraStatusText">Not connected — deploy the worker to sync live boards</div>
+            <div class="jira-status-sub" id="jiraStatusSub">Click Configure → paste your Worker URL → Sync Boards</div>
+          </div>
+          <div style="margin-left:auto;">
+            <span class="badge badge-blue" id="jiraBoardCount">4 boards</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Layout -->
+      <div class="jira-layout">
+
+        <!-- LEFT: Board List -->
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Jira Projects</div>
+          <div class="jira-board-list" id="jiraBoardList"></div>
+        </div>
+
+        <!-- RIGHT: Board Detail -->
+        <div class="jira-detail" id="jiraDetail">
+          <div class="jira-empty">
+            <div class="icon">🔷</div>
+            <p>Select a Jira board to view its RACI breakdown</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /main -->
+<!-- Jira Config -->
+<div class="modal-overlay" id="modalJira">
+  <div class="modal-card">
+    <div class="modal-title">🔷 Connect Jira</div>
+    <div class="modal-sub">Paste your Netlify function URL to sync live Jira boards.</div>
+    <div class="modal-field">
+      <label>Proxy URL</label>
+      <input id="jProxyUrl" placeholder="https://dapper-smakager-7d5f70.netlify.app/.netlify/functions/jira-proxy"/>
+      <div style="font-size:11px;color:var(--text3);margin-top:5px;">Your Netlify function URL. Credentials stay server-side in Netlify environment variables.</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalJira')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveJiraConfig()">Save & Sync</button>
+    </div>
+  </div>
+</div>
+
+<div class="jira-reassign-toast" id="reassignToast"></div>
+
+</div><!-- /appShell -->
+
+<!-- ══════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════ -->
+<!-- Add Task -->
+<div class="modal-overlay" id="modalTask">
+  <div class="modal-card">
+    <div class="modal-title" id="modalTaskTitle">Add Task</div>
+    <div class="modal-sub">Define a new activity or deliverable in the RACI Matrix.</div>
+    <div class="modal-field"><label>Task / Activity Name</label><input id="mTaskName" placeholder="e.g. Deploy Contentful release"/></div>
+    <div class="modal-field"><label>Workstream</label><select id="mTaskWS"></select></div>
+    <div class="modal-field"><label>Category</label><input id="mTaskCat" placeholder="e.g. Releases, Configuration, Support"/></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalTask')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Save Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Role -->
+<div class="modal-overlay" id="modalRole">
+  <div class="modal-card">
+    <div class="modal-title">Add Role</div>
+    <div class="modal-sub">Add a team member or functional role to the matrix.</div>
+    <div class="modal-field"><label>Role / Title</label><input id="mRoleName" placeholder="e.g. Engineering Lead"/></div>
+    <div class="modal-field"><label>Person Name</label><input id="mRolePerson" placeholder="e.g. Isaac"/></div>
+    <div class="modal-field"><label>Department</label><input id="mRoleDept" placeholder="e.g. Engineering, PMO, HR"/></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalRole')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRole()">Save Role</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Workstream -->
+<div class="modal-overlay" id="modalWS">
+  <div class="modal-card">
+    <div class="modal-title">Add Workstream</div>
+    <div class="modal-sub">Define a new project or functional area.</div>
+    <div class="modal-field"><label>Workstream Name</label><input id="mWSName" placeholder="e.g. Jira Configuration"/></div>
+    <div class="modal-field"><label>Description</label><textarea id="mWSDesc" rows="2" placeholder="Brief description of this workstream..."></textarea></div>
+    <div class="modal-field"><label>Status</label>
+      <select id="mWSStatus">
+        <option>Active</option><option>Planning</option><option>On Hold</option><option>Completed</option>
+      </select>
+    </div>
+    <div class="modal-field"><label>Owner</label><input id="mWSOwner" placeholder="e.g. Douglas F."/></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalWS')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveWS()">Save Workstream</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   DATA STORE
+══════════════════════════════════════════ */
+const CYCLE = ['R','A','C','I',''];
+
+let editMode     = false;
+let jiraProxyUrl = '';
+
+let roles = [
+  { id:'r1', name:'Douglas F.', title:'Tech Config & Delivery Lead', dept:'PMO' },
+  { id:'r2', name:'AV',         title:'VP Digital Products & Platforms', dept:'Leadership' },
+  { id:'r3', name:'Isaac',      title:'Engineering Lead', dept:'Engineering' },
+  { id:'r4', name:'Jessica',    title:'HR Manager', dept:'HR' },
+  { id:'r5', name:'Kristin',    title:'Operations Lead', dept:'Operations' },
+  { id:'r6', name:'Vendor',     title:'3rd Party / Vendor', dept:'External' },
+];
+
+let workstreams = [
+  { id:'ws1', name:'App Support', desc:'Application support operations and ticket management', status:'Active', owner:'Douglas F.' },
+  { id:'ws2', name:'PMO / Delivery', desc:'Project delivery, roadmap, and sprint management', status:'Active', owner:'Douglas F.' },
+  { id:'ws3', name:'Configs & Access', desc:'System configuration and user access control', status:'Active', owner:'Douglas F.' },
+  { id:'ws4', name:'Onboarding', desc:'Employee and system onboarding processes', status:'Active', owner:'Jessica' },
+  { id:'ws5', name:'Integrations', desc:'Third-party integrations: Exigo, GetStream, Contentful', status:'Planning', owner:'Isaac' },
+];
+
+let tasks = [
+  // App Support
+  { id:'t1',  name:'Triage & prioritize support tickets',    ws:'ws1', cat:'App Support' },
+  { id:'t2',  name:'Escalate P1/P2 incidents',              ws:'ws1', cat:'App Support' },
+  { id:'t3',  name:'Maintain App Support knowledge base',   ws:'ws1', cat:'App Support' },
+  { id:'t4',  name:'Conduct root cause analysis (RCA)',      ws:'ws1', cat:'App Support' },
+  { id:'t5',  name:'Communicate outage status to stakeholders', ws:'ws1', cat:'App Support' },
+  // PMO / Delivery
+  { id:'t6',  name:'Define sprint goals and scope',          ws:'ws2', cat:'Delivery' },
+  { id:'t7',  name:'Facilitate stand-ups and retrospectives',ws:'ws2', cat:'Delivery' },
+  { id:'t8',  name:'Maintain project roadmap',               ws:'ws2', cat:'Delivery' },
+  { id:'t9',  name:'Track and report delivery KPIs',         ws:'ws2', cat:'Delivery' },
+  { id:'t10', name:'Manage stakeholder communications',      ws:'ws2', cat:'Delivery' },
+  // Configs & Access
+  { id:'t11', name:'Manage Jira space configuration',        ws:'ws3', cat:'Configuration' },
+  { id:'t12', name:'Provision and deprovision user access',  ws:'ws3', cat:'Access Control' },
+  { id:'t13', name:'Maintain System Access Registry',        ws:'ws3', cat:'Access Control' },
+  { id:'t14', name:'Conduct quarterly access reviews',       ws:'ws3', cat:'Access Control' },
+  { id:'t15', name:'Manage environment configs (Dev/Prod)',   ws:'ws3', cat:'Configuration' },
+  // Onboarding
+  { id:'t16', name:'Create employee onboarding plan',        ws:'ws4', cat:'Onboarding' },
+  { id:'t17', name:'Provision new hire system access',       ws:'ws4', cat:'Onboarding' },
+  { id:'t18', name:'Deliver system orientation training',    ws:'ws4', cat:'Onboarding' },
+  // Integrations
+  { id:'t19', name:'Scope and plan Exigo integration',       ws:'ws5', cat:'Integration' },
+  { id:'t20', name:'Configure GetStream instance',           ws:'ws5', cat:'Integration' },
+  { id:'t21', name:'Manage Contentful content model',        ws:'ws5', cat:'Integration' },
+];
+
+// matrix[taskId][roleId] = 'R'|'A'|'C'|'I'|''
+let matrix = {
+  t1:  { r1:'R', r2:'I', r3:'C', r4:'',  r5:'I', r6:'' },
+  t2:  { r1:'R', r2:'A', r3:'C', r4:'',  r5:'I', r6:'' },
+  t3:  { r1:'R', r2:'I', r3:'C', r4:'',  r5:'',  r6:'' },
+  t4:  { r1:'R', r2:'A', r3:'R', r4:'',  r5:'C', r6:'C' },
+  t5:  { r1:'R', r2:'A', r3:'C', r4:'',  r5:'I', r6:'' },
+  t6:  { r1:'R', r2:'A', r3:'C', r4:'',  r5:'C', r6:'' },
+  t7:  { r1:'R', r2:'I', r3:'C', r4:'',  r5:'C', r6:'' },
+  t8:  { r1:'R', r2:'A', r3:'C', r4:'',  r5:'C', r6:'' },
+  t9:  { r1:'R', r2:'A', r3:'I', r4:'',  r5:'I', r6:'' },
+  t10: { r1:'R', r2:'A', r3:'I', r4:'C', r5:'C', r6:'' },
+  t11: { r1:'R', r2:'A', r3:'C', r4:'',  r5:'',  r6:'' },
+  t12: { r1:'R', r2:'A', r3:'C', r4:'C', r5:'I', r6:'' },
+  t13: { r1:'R', r2:'I', r3:'C', r4:'C', r5:'I', r6:'' },
+  t14: { r1:'R', r2:'A', r3:'C', r4:'C', r5:'I', r6:'' },
+  t15: { r1:'R', r2:'I', r3:'A', r4:'',  r5:'',  r6:'C' },
+  t16: { r1:'C', r2:'I', r3:'',  r4:'R', r5:'C', r6:'' },
+  t17: { r1:'R', r2:'I', r3:'C', r4:'A', r5:'I', r6:'' },
+  t18: { r1:'R', r2:'I', r3:'C', r4:'A', r5:'I', r6:'' },
+  t19: { r1:'A', r2:'A', r3:'R', r4:'',  r5:'C', r6:'C' },
+  t20: { r1:'C', r2:'I', r3:'R', r4:'',  r5:'',  r6:'C' },
+  t21: { r1:'C', r2:'I', r3:'R', r4:'',  r5:'C', r6:'C' },
+};
+// ensure all cells exist
+tasks.forEach(t => {
+  if(!matrix[t.id]) matrix[t.id] = {};
+  roles.forEach(r => { if(matrix[t.id][r.id] === undefined) matrix[t.id][r.id] = ''; });
+});
+
+/* ══════════════════════════════════════════
+   INIT ON LOAD
+══════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', init);
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+const PAGES = ['matrix','roles','workstreams','overview','charts','jira'];
+const PAGE_LABELS = { matrix:'RACI Matrix', roles:'Roles & Owners', workstreams:'Workstreams', overview:'Summary View', charts:'Charts', jira:'Jira Boards' };
+
+function showPage(id) {
+  PAGES.forEach(p => {
+    document.getElementById('page-'+p).classList.toggle('active', p===id);
+    document.getElementById('tab-'+p).classList.toggle('active', p===id);
+  });
+  document.getElementById('tbPage').textContent = PAGE_LABELS[id];
+  if (id === 'charts') renderCharts();
+  if (id === 'jira')   renderJiraBoards();
+  if (id === 'workstreams') renderWS();
+  if (id === 'roles') renderRoles();
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+function init() {
+  // Date
+  const d = new Date();
+  document.getElementById('tbDate').textContent = d.toLocaleDateString('en-US',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+  populateFilters();
+  populateChartSelectors();
+  if (jiraProxyUrl) {
+    document.getElementById('jiraStatusText').textContent = 'Proxy configured — click Sync Boards to connect';
+    document.getElementById('jiraStatusSub').textContent  = jiraProxyUrl;
+  }
+  // Load saved proxy URL
+  try {
+    const saved = localStorage.getItem('jiraProxyUrl');
+    if (saved) {
+      jiraProxyUrl = saved;
+      document.getElementById('jiraStatusText').textContent = 'Proxy saved — click Sync Boards to connect';
+      document.getElementById('jiraStatusSub').textContent  = saved;
+    }
+  } catch(e) {}
+  renderKPIs();
+  renderMatrix();
+}
+
+function populateFilters() {
+  const wsEl   = document.getElementById('filterWS');
+  const roleEl = document.getElementById('filterRole');
+  const mWSEl  = document.getElementById('mTaskWS');
+  wsEl.innerHTML   = '<option value="">All Workstreams</option>';
+  roleEl.innerHTML = '<option value="">All Roles</option>';
+  mWSEl.innerHTML  = '';
+  workstreams.forEach(ws => {
+    wsEl.innerHTML   += `<option value="${ws.id}">${ws.name}</option>`;
+    mWSEl.innerHTML  += `<option value="${ws.id}">${ws.name}</option>`;
+  });
+  roles.forEach(r => {
+    roleEl.innerHTML += `<option value="${r.id}">${r.name} (${r.title})</option>`;
+  });
+}
+
+/* ══════════════════════════════════════════
+   KPIs
+══════════════════════════════════════════ */
+function renderKPIs() {
+  let totalR=0, totalA=0, gaps=0;
+  tasks.forEach(t => {
+    let hasA = false;
+    roles.forEach(r => {
+      const v = matrix[t.id]?.[r.id] || '';
+      if(v==='R') totalR++;
+      if(v==='A') { totalA++; hasA=true; }
+    });
+    if(!hasA) gaps++;
+  });
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Tasks</div><div class="kpi-val">${tasks.length}</div><div class="kpi-note">Across ${workstreams.length} workstreams</div></div>
+    <div class="kpi-card"><div class="kpi-label">Roles</div><div class="kpi-val">${roles.length}</div><div class="kpi-note">Active participants</div></div>
+    <div class="kpi-card"><div class="kpi-label">Responsible</div><div class="kpi-val" style="color:var(--r-fg)">${totalR}</div><div class="kpi-note">R assignments</div></div>
+    <div class="kpi-card"><div class="kpi-label">Accountable</div><div class="kpi-val" style="color:var(--a-fg)">${totalA}</div><div class="kpi-note">A assignments</div></div>
+    <div class="kpi-card"><div class="kpi-label">Gaps</div><div class="kpi-val" style="color:${gaps>0?'var(--r-fg)':'var(--i-fg)'}">${gaps}</div><div class="kpi-note">Tasks missing Accountable</div></div>
+  `;
+}
+
+/* ══════════════════════════════════════════
+   MATRIX RENDER
+══════════════════════════════════════════ */
+function renderMatrix() {
+  const search  = document.getElementById('searchInput').value.toLowerCase();
+  const filterWS= document.getElementById('filterWS').value;
+  const filterRole= document.getElementById('filterRole').value;
+  const filterType= document.getElementById('filterType').value;
+
+  let filtered = tasks.filter(t => {
+    if(search && !t.name.toLowerCase().includes(search) && !t.cat.toLowerCase().includes(search)) return false;
+    if(filterWS && t.ws !== filterWS) return false;
+    if(filterRole || filterType) {
+      const hasMatch = roles.some(r => {
+        if(filterRole && r.id !== filterRole) return false;
+        const v = matrix[t.id]?.[r.id] || '';
+        if(filterType && v !== filterType) return false;
+        return !filterType || v === filterType;
+      });
+      if(!hasMatch) return false;
+    }
+    return true;
+  });
+
+  const tbl = document.getElementById('raciTable');
+  // Header
+  let hd = '<thead><tr><th>Task / Activity</th>';
+  roles.forEach(r => { hd += `<th class="role-col" title="${r.name} — ${r.title}">${r.name}<br/><span style="font-size:9px;opacity:.7;font-weight:400;text-transform:none;">${r.title.split(' ').slice(0,2).join(' ')}</span></th>`; });
+  hd += '</tr></thead>';
+
+  // Body — group by workstream
+  let bd = '<tbody>';
+  const wsByTasks = {};
+  filtered.forEach(t => {
+    const wsName = workstreams.find(w => w.id === t.ws)?.name || 'Other';
+    if(!wsByTasks[wsName]) wsByTasks[wsName] = [];
+    wsByTasks[wsName].push(t);
+  });
+
+  if(filtered.length === 0) {
+    bd += `<tr><td colspan="${roles.length+1}" style="padding:40px;text-align:center;color:var(--text3);">No tasks match the current filters.</td></tr>`;
+  } else {
+    Object.entries(wsByTasks).forEach(([wsName, wsTasks]) => {
+      bd += `<tr class="cat-row"><td colspan="${roles.length+1}">📁 ${wsName}</td></tr>`;
+      wsTasks.forEach(t => {
+        bd += `<tr>
+          <td>
+            <div class="task-name">${t.name}</div>
+            <div class="task-cat">${t.cat}</div>
+          </td>`;
+        roles.forEach(r => {
+          const val = matrix[t.id]?.[r.id] || '';
+          const display = val || '·';
+          const cls = val || 'X';
+          const clickable = editMode ? `onclick="cycleCell('${t.id}','${r.id}')" style="cursor:pointer"` : '';
+          bd += `<td class="task-cell"><span class="raci-badge ${cls}" id="cell-${t.id}-${r.id}" ${clickable}>${display}</span></td>`;
+        });
+        bd += '</tr>';
+      });
+    });
+  }
+  bd += '</tbody>';
+  tbl.innerHTML = hd + bd;
+}
+
+/* ══════════════════════════════════════════
+   EDIT MODE
+══════════════════════════════════════════ */
+function toggleEditMode() {
+  editMode = !editMode;
+  const btn = document.getElementById('editToggle');
+  btn.textContent = editMode ? '🔒 Lock Matrix' : '✏️ Edit Mode';
+  btn.style.background = editMode ? 'var(--navy)' : '';
+  btn.style.color       = editMode ? 'var(--citron)' : '';
+  renderMatrix();
+}
+
+function cycleCell(tid, rid) {
+  if(!editMode) return;
+  const curr = matrix[tid]?.[rid] || '';
+  const idx  = CYCLE.indexOf(curr);
+  const next = CYCLE[(idx+1) % CYCLE.length];
+  if(!matrix[tid]) matrix[tid] = {};
+  matrix[tid][rid] = next;
+  // update just this cell
+  const el = document.getElementById(`cell-${tid}-${rid}`);
+  if(el) {
+    el.className = 'raci-badge ' + (next || 'X');
+    el.textContent = next || '·';
+  }
+  renderKPIs();
+}
+
+/* ══════════════════════════════════════════
+   ROLES VIEW
+══════════════════════════════════════════ */
+function renderRoles() {
+  const grid = document.getElementById('roleGrid');
+  grid.innerHTML = roles.map(r => {
+    let rCount=0, aCount=0, cCount=0, iCount=0;
+    tasks.forEach(t => {
+      const v = matrix[t.id]?.[r.id] || '';
+      if(v==='R') rCount++;
+      else if(v==='A') aCount++;
+      else if(v==='C') cCount++;
+      else if(v==='I') iCount++;
+    });
+    return `<div class="role-card">
+      <div class="role-card-name">${r.name}</div>
+      <div class="role-card-title">${r.title} · ${r.dept}</div>
+      <div class="role-stats">
+        <span class="role-stat" style="background:var(--r-bg);color:var(--r-fg)">R: ${rCount}</span>
+        <span class="role-stat" style="background:var(--a-bg);color:var(--a-fg)">A: ${aCount}</span>
+        <span class="role-stat" style="background:var(--c-bg);color:var(--c-fg)">C: ${cCount}</span>
+        <span class="role-stat" style="background:var(--i-bg);color:var(--i-fg)">I: ${iCount}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   WORKSTREAMS VIEW
+══════════════════════════════════════════ */
+function renderWS() {
+  const statusColors = { Active:'badge-green', Planning:'badge-blue', 'On Hold':'badge-yellow', Completed:'badge-gray' };
+  document.getElementById('wsBody').innerHTML = workstreams.map(ws => {
+    const count = tasks.filter(t => t.ws === ws.id).length;
+    const sc = statusColors[ws.status] || 'badge-gray';
+    return `<tr>
+      <td><strong>${ws.name}</strong></td>
+      <td style="color:var(--text3)">${ws.desc}</td>
+      <td><span class="badge ${sc}">${ws.status}</span></td>
+      <td>${count}</td>
+      <td>${ws.owner}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   SUMMARY VIEW
+══════════════════════════════════════════ */
+function renderSummary() {
+  const maxLoad = tasks.length;
+  document.getElementById('summaryBody').innerHTML = roles.map(r => {
+    let rC=0, aC=0, cC=0, iC=0;
+    tasks.forEach(t => {
+      const v = matrix[t.id]?.[r.id] || '';
+      if(v==='R') rC++;
+      else if(v==='A') aC++;
+      else if(v==='C') cC++;
+      else if(v==='I') iC++;
+    });
+    const total = rC+aC+cC+iC;
+    const pct   = Math.round((total/maxLoad)*100);
+    const barColor = pct>80?'var(--r-fg)':pct>50?'var(--a-fg)':'var(--i-fg)';
+    return `<tr>
+      <td><strong>${r.title}</strong></td>
+      <td>${r.name}</td>
+      <td style="color:var(--r-fg);font-weight:700">${rC}</td>
+      <td style="color:var(--a-fg);font-weight:700">${aC}</td>
+      <td style="color:var(--c-fg);font-weight:700">${cC}</td>
+      <td style="color:var(--i-fg);font-weight:700">${iC}</td>
+      <td><strong>${total}</strong></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;background:var(--line);border-radius:4px;height:6px;min-width:80px">
+            <div style="width:${pct}%;background:${barColor};height:6px;border-radius:4px"></div>
+          </div>
+          <span style="font-size:12px;color:var(--text3);width:32px">${pct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Gap analysis
+  const gaps = tasks.filter(t => !roles.some(r => (matrix[t.id]?.[r.id]||'') === 'A'));
+  const multiA = tasks.filter(t => roles.filter(r => (matrix[t.id]?.[r.id]||'') === 'A').length > 1);
+  const multiR = tasks.filter(t => roles.filter(r => (matrix[t.id]?.[r.id]||'') === 'R').length === 0);
+  let gapHtml = '';
+  if(gaps.length===0 && multiA.length===0 && multiR.length===0) {
+    gapHtml = '<div class="empty-state"><div class="icon">✅</div><p>No RACI gaps detected. All tasks have exactly one Accountable owner.</p></div>';
+  } else {
+    if(gaps.length>0) gapHtml += `<div class="badge badge-red" style="margin-bottom:10px;padding:6px 12px;">⚠️ ${gaps.length} task(s) missing an Accountable owner</div><br/>`;
+    gaps.forEach(t => { gapHtml += `<div style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--line);color:var(--text2)">→ <strong>${t.name}</strong> (${workstreams.find(w=>w.id===t.ws)?.name||''})</div>`; });
+    if(multiA.length>0) { gapHtml += `<br/><div class="badge badge-yellow" style="padding:6px 12px;margin-bottom:10px;">⚠️ ${multiA.length} task(s) with multiple Accountable owners</div><br/>`; }
+    if(multiR.length>0) { gapHtml += `<br/><div class="badge badge-blue" style="padding:6px 12px;margin-bottom:10px;">ℹ️ ${multiR.length} task(s) with no Responsible assigned</div><br/>`; }
+  }
+  document.getElementById('gapBody').innerHTML = gapHtml;
+}
+
+/* ══════════════════════════════════════════
+   MODALS
+══════════════════════════════════════════ */
+let editingTaskId = null;
+
+function openAddTask() {
+  editingTaskId = null;
+  document.getElementById('modalTaskTitle').textContent = 'Add Task';
+  document.getElementById('mTaskName').value = '';
+  document.getElementById('mTaskCat').value  = '';
+  populateFilters();
+  document.getElementById('modalTask').classList.add('open');
+}
+
+function saveTask() {
+  const name = document.getElementById('mTaskName').value.trim();
+  const ws   = document.getElementById('mTaskWS').value;
+  const cat  = document.getElementById('mTaskCat').value.trim();
+  if(!name) return;
+  const id = 't' + Date.now();
+  tasks.push({ id, name, ws, cat: cat || 'General' });
+  matrix[id] = {};
+  roles.forEach(r => { matrix[id][r.id] = ''; });
+  closeModal('modalTask');
+  renderKPIs();
+  renderMatrix();
+}
+
+function openAddRole() {
+  document.getElementById('mRoleName').value   = '';
+  document.getElementById('mRolePerson').value = '';
+  document.getElementById('mRoleDept').value   = '';
+  document.getElementById('modalRole').classList.add('open');
+}
+
+function saveRole() {
+  const title  = document.getElementById('mRoleName').value.trim();
+  const person = document.getElementById('mRolePerson').value.trim();
+  const dept   = document.getElementById('mRoleDept').value.trim();
+  if(!title) return;
+  const id = 'r' + Date.now();
+  roles.push({ id, name: person || title, title, dept: dept || 'General' });
+  tasks.forEach(t => { matrix[t.id][id] = ''; });
+  closeModal('modalRole');
+  populateFilters();
+  renderKPIs();
+  renderMatrix();
+  renderRoles();
+}
+
+function openAddWS() {
+  document.getElementById('mWSName').value   = '';
+  document.getElementById('mWSDesc').value   = '';
+  document.getElementById('mWSOwner').value  = '';
+  document.getElementById('modalWS').classList.add('open');
+}
+
+function saveWS() {
+  const name   = document.getElementById('mWSName').value.trim();
+  const desc   = document.getElementById('mWSDesc').value.trim();
+  const status = document.getElementById('mWSStatus').value;
+  const owner  = document.getElementById('mWSOwner').value.trim();
+  if(!name) return;
+  const id = 'ws' + Date.now();
+  workstreams.push({ id, name, desc: desc || '', status, owner: owner || '—' });
+  closeModal('modalWS');
+  populateFilters();
+  renderWS();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if(e.target === el) el.classList.remove('open'); });
+});
+
+/* ══════════════════════════════════════════
+   CHARTS
+══════════════════════════════════════════ */
+function populateChartSelectors() {
+  const el = document.getElementById('chartWSSelect');
+  if(!el) return;
+  el.innerHTML = workstreams.map(ws => `<option value="${ws.id}">${ws.name}</option>`).join('');
+}
+
+function renderCharts() {
+  const wsId = document.getElementById('chartWSSelect').value;
+  const ws   = workstreams.find(w => w.id === wsId);
+  const wsTasks = tasks.filter(t => t.ws === wsId);
+
+  document.getElementById('chartRoleTitle').textContent = `Role Breakdown — ${ws?.name || ''}`;
+
+  /* ── 1. STACKED BAR CHART per role ── */
+  const maxTasks = wsTasks.length || 1;
+  const barHTML = roles.map(r => {
+    let rC=0, aC=0, cC=0, iC=0;
+    wsTasks.forEach(t => {
+      const v = matrix[t.id]?.[r.id] || '';
+      if(v==='R') rC++;
+      else if(v==='A') aC++;
+      else if(v==='C') cC++;
+      else if(v==='I') iC++;
+    });
+    const total = rC + aC + cC + iC;
+    const pctR = (rC/maxTasks)*100, pctA = (aC/maxTasks)*100;
+    const pctC = (cC/maxTasks)*100, pctI = (iC/maxTasks)*100;
+    const pctEmpty = 100 - pctR - pctA - pctC - pctI;
+
+    const seg = (pct, type, count) => pct > 0
+      ? `<div class="role-bar-seg ${type}" style="width:${pct}%">${count > 0 && pct > 6 ? type : ''}</div>`
+      : '';
+
+    return `<div class="role-bar-row">
+      <div class="role-bar-header">
+        <span class="role-bar-name">${r.name} <span style="font-size:11px;color:var(--text3);font-weight:400">${r.title}</span></span>
+        <span class="role-bar-total">${total} assignment${total!==1?'s':''}</span>
+      </div>
+      <div class="role-bar-track">
+        ${seg(pctR,'R',rC)}
+        ${seg(pctA,'A',aC)}
+        ${seg(pctC,'C',cC)}
+        ${seg(pctI,'I',iC)}
+        ${pctEmpty > 0 ? `<div class="role-bar-seg empty" style="width:${pctEmpty}%">${pctEmpty > 15 ? 'No assignment' : ''}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:10px;margin-top:5px;flex-wrap:wrap;">
+        ${rC>0?`<span style="font-size:11px;color:var(--r-fg);font-weight:600">R: ${rC}</span>`:''}
+        ${aC>0?`<span style="font-size:11px;color:var(--a-fg);font-weight:600">A: ${aC}</span>`:''}
+        ${cC>0?`<span style="font-size:11px;color:var(--c-fg);font-weight:600">C: ${cC}</span>`:''}
+        ${iC>0?`<span style="font-size:11px;color:var(--i-fg);font-weight:600">I: ${iC}</span>`:''}
+        ${total===0?`<span style="font-size:11px;color:var(--text3)">Not involved</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('chartRoleBody').innerHTML = barHTML || '<div class="empty-state"><div class="icon">📭</div><p>No tasks in this workstream yet.</p></div>';
+
+  /* ── 2. DONUT CHART ── */
+  let totalR=0, totalA=0, totalC=0, totalI=0;
+  wsTasks.forEach(t => {
+    roles.forEach(r => {
+      const v = matrix[t.id]?.[r.id] || '';
+      if(v==='R') totalR++;
+      else if(v==='A') totalA++;
+      else if(v==='C') totalC++;
+      else if(v==='I') totalI++;
+    });
+  });
+  const grandTotal = totalR + totalA + totalC + totalI || 1;
+  const donutData = [
+    { label:'Responsible', val:totalR, bg:'#FEE2E2', stroke:'#FC8181', text:'#C53030' },
+    { label:'Accountable', val:totalA, bg:'#FEF3C7', stroke:'#FBBF24', text:'#92400E' },
+    { label:'Consulted',   val:totalC, bg:'#DBEAFE', stroke:'#93C5FD', text:'#1E40AF' },
+    { label:'Informed',    val:totalI, bg:'#D1FAE5', stroke:'#6EE7B7', text:'#065F46' },
+  ];
+
+  const canvas = document.getElementById('donutCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,160,160);
+  const cx=80, cy=80, outerR=72, innerR=44;
+  let startAngle = -Math.PI/2;
+  donutData.forEach(d => {
+    if(!d.val) return;
+    const sweep = (d.val / grandTotal) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx + outerR * Math.cos(startAngle), cy + outerR * Math.sin(startAngle));
+    ctx.arc(cx, cy, outerR, startAngle, startAngle+sweep);
+    ctx.arc(cx, cy, innerR, startAngle+sweep, startAngle, true);
+    ctx.closePath();
+    ctx.fillStyle = d.stroke;
+    ctx.fill();
+    startAngle += sweep;
+  });
+  // center hole fill
+  ctx.beginPath(); ctx.arc(cx,cy,innerR-2,0,Math.PI*2); ctx.fillStyle='white'; ctx.fill();
+  // center text
+  ctx.fillStyle = '#1A2238'; ctx.font = 'bold 22px DM Sans, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(grandTotal, cx, cy-8);
+  ctx.fillStyle = '#718096'; ctx.font = '11px DM Sans, sans-serif';
+  ctx.fillText('total', cx, cy+10);
+
+  document.getElementById('donutLegend').innerHTML = donutData.map(d =>
+    `<div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+      <div style="width:12px;height:12px;border-radius:3px;background:${d.stroke};flex-shrink:0;"></div>
+      <span style="color:var(--text2)">${d.label}</span>
+      <strong style="color:${d.text};margin-left:auto;padding-left:12px">${d.val}</strong>
+    </div>`
+  ).join('');
+
+  /* ── 3. ACCOUNTABLE LIST ── */
+  const accItems = wsTasks.map(t => {
+    const owner = roles.find(r => (matrix[t.id]?.[r.id]||'') === 'A');
+    return `<div class="accountable-item">
+      <span class="accountable-task">${t.name}</span>
+      ${owner
+        ? `<span class="accountable-role">${owner.name}</span>`
+        : `<span class="accountable-role" style="background:var(--r-bg);color:var(--r-fg);">⚠ Unassigned</span>`}
+    </div>`;
+  }).join('');
+  document.getElementById('accountableList').innerHTML = accItems || '<div class="empty-state"><div class="icon">📭</div><p>No tasks yet.</p></div>';
+}
+
+/* ══════════════════════════════════════════
+   JIRA
+══════════════════════════════════════════ */
+
+// Pre-loaded BombParty Jira boards mapped to workstreams
+const jiraBoards = [
+  {
+    id: 'bp-plus', key: 'BP+', name: 'BombParty Plus', icon: '💎',
+    type: 'Scrum', status: 'Active',
+    desc: 'Core product — BombParty Plus subscription & features',
+    wsId: null, // cross-functional — uses custom task set below
+    tasks: [
+      { id:'bp1', name:'Define BP+ feature roadmap' },
+      { id:'bp2', name:'Sprint planning & backlog grooming' },
+      { id:'bp3', name:'Configure BP+ subscription tiers (Exigo)' },
+      { id:'bp4', name:'QA & release sign-off' },
+      { id:'bp5', name:'Communicate release notes to stakeholders' },
+      { id:'bp6', name:'Monitor post-release performance' },
+      { id:'bp7', name:'Manage BP+ access & entitlements' },
+    ],
+    raciMap: {
+      // taskId: { roleId: 'R'|'A'|'C'|'I' }
+      bp1: { r1:'C', r2:'A', r3:'C', r4:'',  r5:'C', r6:'' },
+      bp2: { r1:'R', r2:'A', r3:'C', r4:'',  r5:'C', r6:'' },
+      bp3: { r1:'R', r2:'A', r3:'C', r4:'',  r5:'I', r6:'C' },
+      bp4: { r1:'C', r2:'A', r3:'R', r4:'',  r5:'I', r6:'' },
+      bp5: { r1:'R', r2:'A', r3:'I', r4:'I', r5:'I', r6:'' },
+      bp6: { r1:'R', r2:'I', r3:'R', r4:'',  r5:'C', r6:'' },
+      bp7: { r1:'R', r2:'A', r3:'C', r4:'C', r5:'I', r6:'' },
+    }
+  },
+  {
+    id: 'appsup', key: 'APPSUP', name: 'Application Support', icon: '🛠️',
+    type: 'Kanban', status: 'Active',
+    desc: 'Incident management, triage, and support operations',
+    wsId: 'ws1',
+    tasks: null, raciMap: null // pulled from main matrix
+  },
+  {
+    id: 'delivery', key: 'DELIVERY', name: 'Delivery / PMO', icon: '🚀',
+    type: 'Scrum', status: 'Active',
+    desc: 'Project delivery, sprints, roadmap, and stakeholder management',
+    wsId: 'ws2',
+    tasks: null, raciMap: null
+  },
+  {
+    id: 'configs', key: 'CONFIGS', name: 'Configs & Access', icon: '⚙️',
+    type: 'Kanban', status: 'Active',
+    desc: 'System configuration, access control, and environment management',
+    wsId: 'ws3',
+    tasks: null, raciMap: null
+  },
+];
+
+let jiraConfig   = { url:'', email:'', token:'' };
+let activeBoard  = null;
+
+function renderJiraBoards() {
+  const list = document.getElementById('jiraBoardList');
+  list.innerHTML = jiraBoards.map(b => {
+    const taskCount = getBoardTasks(b).length;
+    return `<div class="jira-board-card${activeBoard===b.id?' active':''}" onclick="selectBoard('${b.id}')">
+      <div class="jb-top">
+        <div class="jb-icon" style="background:${activeBoard===b.id?'rgba(212,228,75,.15)':'var(--soft)'}">${b.icon}</div>
+        <div>
+          <div class="jb-key">${b.key}</div>
+          <div class="jb-name">${b.name}</div>
+        </div>
+      </div>
+      <div class="jb-meta">${b.desc}</div>
+      <div class="jb-footer">
+        <span class="jb-badge">${b.type}</span>
+        <span style="font-size:11px;color:${activeBoard===b.id?'rgba(255,255,255,.45)':'var(--text3)'};">${taskCount} tasks</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getBoardTasks(board) {
+  if (board.tasks) return board.tasks; // custom tasks (BP+)
+  return tasks.filter(t => t.ws === board.wsId);
+}
+
+function getBoardRaci(board, taskId, roleId) {
+  if (board.raciMap) return board.raciMap[taskId]?.[roleId] || '';
+  return matrix[taskId]?.[roleId] || '';
+}
+
+function selectBoard(boardId) {
+  activeBoard = boardId;
+  renderJiraBoards();
+  renderBoardDetail(boardId);
+}
+
+function renderBoardDetail(boardId) {
+  const board = jiraBoards.find(b => b.id === boardId);
+  const detail = document.getElementById('jiraDetail');
+  const boardTasks = getBoardTasks(board);
+
+  // RACI counts per role
+  const roleCounts = {};
+  roles.forEach(r => { roleCounts[r.id] = { R:0, A:0, C:0, I:0 }; });
+  boardTasks.forEach(t => {
+    roles.forEach(r => {
+      const v = getBoardRaci(board, t.id, r.id);
+      if(v && roleCounts[r.id][v] !== undefined) roleCounts[r.id][v]++;
+    });
+  });
+
+  const raciRoles = { R:[], A:[], C:[], I:[] };
+  roles.forEach(r => {
+    ['R','A','C','I'].forEach(type => {
+      if(roleCounts[r.id][type] > 0) raciRoles[type].push({ role:r, count:roleCounts[r.id][type] });
+    });
+  });
+
+  const totalAssign = roles.reduce((s,r) => s + roleCounts[r.id].R + roleCounts[r.id].A + roleCounts[r.id].C + roleCounts[r.id].I, 0);
+  const raciLabel = { R:'Responsible', A:'Accountable', C:'Consulted', I:'Informed' };
+
+  // KPI cards
+  const kpiHtml = ['R','A','C','I'].map(type => {
+    const who = raciRoles[type].map(x=>x.role.name).join(', ') || '—';
+    return `<div class="jira-kpi ${type}">
+      <div class="jira-kpi-label">${raciLabel[type]}</div>
+      <div class="jira-kpi-val">${raciRoles[type].length}</div>
+      <div class="jira-kpi-who">${who}</div>
+    </div>`;
+  }).join('');
+
+  // RACI groups — draggable tags
+  const raciGroupHtml = ['R','A','C','I'].map(type => {
+    const people = raciRoles[type];
+    const tags = people.map(p =>
+      `<span class="jrg-role-tag" draggable="true"
+        data-role-id="${p.role.id}" data-role-name="${p.role.name}"
+        data-from-type="${type}" data-board-id="${boardId}">
+        👤 ${p.role.name} <span style="opacity:.55;font-size:10px">${p.count}</span>
+      </span>`
+    ).join('');
+    return `<div class="jira-raci-group ${type}" data-drop-type="${type}" data-board-id="${boardId}">
+      <div class="jrg-header">
+        <div class="jrg-letter">${type}</div>
+        <div class="jrg-title">${raciLabel[type]}</div>
+      </div>
+      <div class="jrg-drop-zone">
+        ${tags || '<span class="jrg-none">None assigned — drop here</span>'}
+      </div>
+      <div class="jrg-drop-hint">Drop here to reassign</div>
+    </div>`;
+  }).join('');
+
+  // Task breakdown
+  const taskRows = boardTasks.map(t => {
+    const badges = ['R','A','C','I'].map(type => {
+      const assigned = roles.filter(r => getBoardRaci(board, t.id, r.id) === type).map(r=>r.name);
+      return assigned.length ? `<span class="jira-task-badge ${type}" title="${assigned.join(', ')}">${type}: ${assigned.join(', ')}</span>` : '';
+    }).join('');
+    return `<div class="jira-task-row">
+      <span class="jira-task-name">${t.name}</span>
+      <div class="jira-task-badges">${badges || '<span style="font-size:11px;color:var(--text3)">Unassigned</span>'}</div>
+    </div>`;
+  }).join('');
+
+  detail.innerHTML = `
+    <div class="jira-board-header">
+      <div class="jira-board-header-icon">${board.icon}</div>
+      <div>
+        <h2>${board.name} <span style="font-size:13px;opacity:.5;font-weight:500">${board.key}</span></h2>
+        <p>${board.desc} · ${board.type} · ${boardTasks.length} tasks · ${totalAssign} assignments</p>
+      </div>
+    </div>
+
+    <div class="jira-kpi-row">${kpiHtml}</div>
+
+    <div class="section-block">
+      <div class="section-block-header">
+        <div class="sbh-left"><span class="sbh-icon">🎯</span>
+          <div>
+            <div class="sbh-title">RACI Assignment Overview</div>
+            <div class="sbh-sub">Drag a person's tag to reassign their responsibility</div>
+          </div>
+        </div>
+        <span class="badge badge-blue" style="font-size:10px;">✋ Drag to reassign</span>
+      </div>
+      <div class="section-block-body">
+        <div class="jira-raci-grid" id="raciDragGrid">${raciGroupHtml}</div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-block-header">
+        <div class="sbh-left"><span class="sbh-icon">📋</span><div><div class="sbh-title">Task Breakdown</div><div class="sbh-sub">RACI assignments per task / story</div></div></div>
+      </div>
+      <div class="section-block-body" id="jiraTaskBreakdown">${taskRows}</div>
+    </div>
+  `;
+
+  initDragDrop(board);
+}
+
+/* ── DRAG & DROP ── */
+let dragPayload = null;
+let ghostEl = null;
+
+function initDragDrop(board) {
+  // Tags — drag source
+  document.querySelectorAll('.jrg-role-tag').forEach(tag => {
+    tag.addEventListener('dragstart', e => {
+      dragPayload = {
+        roleId:   tag.dataset.roleId,
+        roleName: tag.dataset.roleName,
+        fromType: tag.dataset.fromType,
+        boardId:  tag.dataset.boardId,
+      };
+      tag.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+
+      // Custom ghost
+      ghostEl = document.createElement('div');
+      ghostEl.className = 'drag-ghost';
+      ghostEl.textContent = '👤 ' + dragPayload.roleName;
+      document.body.appendChild(ghostEl);
+      e.dataTransfer.setDragImage(ghostEl, -20, -20);
+    });
+
+    tag.addEventListener('dragend', () => {
+      tag.classList.remove('dragging');
+      if(ghostEl) { ghostEl.remove(); ghostEl = null; }
+      document.querySelectorAll('.jira-raci-group').forEach(g => g.classList.remove('drag-over'));
+    });
+  });
+
+  // Groups — drop targets
+  document.querySelectorAll('.jira-raci-group').forEach(group => {
+    group.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('.jira-raci-group').forEach(g => g.classList.remove('drag-over'));
+      group.classList.add('drag-over');
+    });
+
+    group.addEventListener('dragleave', e => {
+      if(!group.contains(e.relatedTarget)) group.classList.remove('drag-over');
+    });
+
+    group.addEventListener('drop', e => {
+      e.preventDefault();
+      group.classList.remove('drag-over');
+      if(!dragPayload) return;
+
+      const toType   = group.dataset.dropType;
+      const fromType = dragPayload.fromType;
+      const roleId   = dragPayload.roleId;
+      const roleName = dragPayload.roleName;
+
+      if(toType === fromType) return; // no-op
+
+      // Apply change to all tasks in this board
+      const brd = jiraBoards.find(b => b.id === dragPayload.boardId);
+      const bTasks = getBoardTasks(brd);
+
+      bTasks.forEach(t => {
+        const current = getBoardRaci(brd, t.id, roleId);
+        if(current === fromType) {
+          // update the right store
+          if(brd.raciMap) {
+            if(!brd.raciMap[t.id]) brd.raciMap[t.id] = {};
+            brd.raciMap[t.id][roleId] = toType;
+          } else {
+            if(!matrix[t.id]) matrix[t.id] = {};
+            matrix[t.id][roleId] = toType;
+          }
+        }
+      });
+
+      dragPayload = null;
+      showToast(`${roleName} moved from ${fromType} → ${toType}`);
+      renderBoardDetail(board.id);
+      renderJiraBoards();
+    });
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('reassignToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function openJiraConfig() {
+  document.getElementById('jProxyUrl').value = jiraProxyUrl;
+  document.getElementById('modalJira').classList.add('open');
+}
+
+function saveJiraConfig() {
+  const input = document.getElementById('jProxyUrl');
+  if (!input) return;
+  const val = input.value.trim().replace(/\/$/, '');
+  if (!val) { input.style.borderColor = 'red'; return; }
+  input.style.borderColor = '';
+  jiraProxyUrl = val;
+  try { localStorage.setItem('jiraProxyUrl', val); } catch(e) {}
+  closeModal('modalJira');
+  syncJira();
+}
+
+function saveJiraBoard() {} // no-op
+
+async function syncJira() {
+  const dot     = document.getElementById('jiraDot');
+  const statTxt = document.getElementById('jiraStatusText');
+  const statSub = document.getElementById('jiraStatusSub');
+  const btn     = document.getElementById('jiraSyncBtn');
+
+  if (!jiraProxyUrl) { openJiraConfig(); return; }
+
+  dot.className     = 'jira-status-dot loading';
+  statTxt.textContent = 'Connecting to Jira...';
+  statSub.textContent = 'Fetching boards via your worker proxy...';
+  btn.textContent   = '↻ Syncing...';
+  btn.disabled      = true;
+
+  try {
+    const res = await fetch(`${jiraProxyUrl}?path=/rest/agile/1.0/board?maxResults=50`);
+
+    if (res.status === 401) throw new Error('401 — Invalid credentials in your worker. Check JIRA_EMAIL and JIRA_TOKEN variables.');
+    if (res.status === 403) throw new Error('403 — Access denied. Token may lack board permissions.');
+    if (res.status === 404) throw new Error('404 — Jira URL not found. Check JIRA_URL in your worker.');
+    if (!res.ok)            throw new Error(`HTTP ${res.status} from worker.`);
+
+    const data   = await res.json();
+    const boards = data.values || [];
+
+    // Merge live boards in
+    boards.forEach(b => {
+      const key    = b.location?.projectKey || b.name.substring(0, 8).toUpperCase();
+      const exists = jiraBoards.find(jb => jb.key === key || jb.name === b.name);
+      if (!exists) {
+        const typeMap = { scrum:'Scrum', kanban:'Kanban' };
+        jiraBoards.push({
+          id:     'live-' + b.id,
+          key,
+          name:   b.name,
+          icon:   '🔷',
+          type:   typeMap[b.type] || 'Kanban',
+          status: 'Active',
+          desc:   b.location?.projectName || b.name,
+          wsId:   null, tasks: [], raciMap: {}
+        });
+      }
+    });
+
+    dot.className       = 'jira-status-dot connected';
+    statTxt.textContent = `Connected — ${boards.length} board${boards.length !== 1 ? 's' : ''} synced from Jira`;
+    statSub.textContent = `Last synced ${new Date().toLocaleTimeString()} · ${jiraBoards.length} total boards`;
+    document.getElementById('jiraBoardCount').textContent = `${jiraBoards.length} boards`;
+    renderJiraBoards();
+
+  } catch (err) {
+    dot.className       = 'jira-status-dot disconnected';
+    statTxt.textContent = 'Connection failed';
+    statSub.textContent = err.message;
+  }
+
+  btn.textContent = '↻ Sync Boards';
+  btn.disabled    = false;
+}
+
+async function syncJira() {
+  const dot     = document.getElementById('jiraDot');
+  const statTxt = document.getElementById('jiraStatusText');
+  const statSub = document.getElementById('jiraStatusSub');
+  const btn     = document.getElementById('jiraSyncBtn');
+
+  if (!jiraConfig.url || !jiraConfig.token || !jiraConfig.email) {
+    openJiraConfig();
+    return;
+  }
+
+  dot.className = 'jira-status-dot loading';
+  statTxt.textContent = 'Connecting to Jira...';
+  statSub.textContent = 'Trying connection...';
+  btn.textContent = '↻ Syncing...';
+  btn.disabled = true;
+
+  const base  = jiraConfig.url.replace(/\/$/, '');
+  const creds = btoa(`${jiraConfig.email}:${jiraConfig.token}`);
+  const target = `${base}/rest/agile/1.0/board?maxResults=50`;
+
+  const proxies = [
+    url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://proxy.cors.sh/${url}`,
+  ];
+
+  let lastError = '';
+
+  for (let i = 0; i < proxies.length; i++) {
+    const proxyUrl = proxies[i](target);
+    statSub.textContent = `Trying proxy ${i + 1} of ${proxies.length}...`;
+    try {
+      const res = await fetch(proxyUrl, {
+        headers: {
+          'Authorization': `Basic ${creds}`,
+          'Accept': 'application/json',
+          'x-requested-with': 'XMLHttpRequest',
+        }
+      });
+
+      if (res.status === 401) throw new Error('401 — Invalid credentials. Check your email and API token.');
+      if (res.status === 403) throw new Error('403 — Access denied. Your token may lack board permissions.');
+      if (res.status === 404) throw new Error('404 — Jira URL not found. Check your site URL.');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      // allorigins wraps response in { contents: "..." }
+      let data;
+      const text = await res.text();
+      try {
+        const parsed = JSON.parse(text);
+        data = parsed.contents ? JSON.parse(parsed.contents) : parsed;
+      } catch {
+        throw new Error('Unexpected response format from proxy.');
+      }
+
+      const boards = data.values || [];
+
+      boards.forEach(b => {
+        const exists = jiraBoards.find(jb => jb.key === b.location?.projectKey || jb.name === b.name);
+        if (!exists) {
+          jiraBoards.push({
+            id: 'jira-' + b.id,
+            key: b.location?.projectKey || b.name.substring(0, 6).toUpperCase(),
+            name: b.name,
+            icon: '🔷',
+            type: b.type === 'scrum' ? 'Scrum' : 'Kanban',
+            status: 'Active',
+            desc: b.location?.projectName || b.name,
+            wsId: null, tasks: [], raciMap: {}
+          });
+        }
+      });
+
+      dot.className = 'jira-status-dot connected';
+      statTxt.textContent = `Connected — ${base}`;
+      statSub.textContent = `${boards.length} board${boards.length !== 1 ? 's' : ''} synced · ${new Date().toLocaleTimeString()}`;
+      document.getElementById('jiraBoardCount').textContent = `${jiraBoards.length} boards loaded`;
+      renderJiraBoards();
+      btn.textContent = '↻ Sync Boards'; btn.disabled = false;
+      return; // success — stop trying proxies
+
+    } catch (err) {
+      lastError = err.message;
+      // if it's an auth/permission error, no point trying other proxies
+      if (err.message.startsWith('401') || err.message.startsWith('403') || err.message.startsWith('404')) break;
+    }
+  }
+
+  // All proxies failed
+  dot.className = 'jira-status-dot disconnected';
+  statTxt.textContent = 'Connection failed';
+  statSub.textContent = lastError || 'All proxies failed. Check your Jira URL, email, and API token.';
+  btn.textContent = '↻ Sync Boards'; btn.disabled = false;
+}
+
+/* ══════════════════════════════════════════
+   EXPORT CSV
+══════════════════════════════════════════ */
+function exportCSV() {
+  let csv = 'Task,Workstream,Category,' + roles.map(r=>r.name).join(',') + '\n';
+  tasks.forEach(t => {
+    const ws = workstreams.find(w=>w.id===t.ws)?.name || '';
+    const cells = roles.map(r => matrix[t.id]?.[r.id] || '').join(',');
+    csv += `"${t.name}","${ws}","${t.cat}",${cells}\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'BombParty_RACI_Matrix.csv'; a.click();
+}
+</script>
+</body>
+</html>
